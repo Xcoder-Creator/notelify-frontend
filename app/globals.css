@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --icons: #5f6368;
+  --hamburger: #5f6368;
+  --foreground-text: #000000;
+  --input-placeholder: #ffffff99;
+  --note-title-content: #000000;
+  --note-card: #ffffff;
+  --check-icon-div: #000000;
+  --note-card-border: #e0e0e0;
+  --check-icon: #ffffff;
+  --note-editor-background: #ffffff;
+  --note-editor-border: #e0e0e0;
+  --active-drawer-link: #feefc3;
+  --header-shadow: rgb(218, 220, 224);
+  --section-label: rgb(95,99,104);
+  --page-drawer-link: rgb(241, 243, 244);
+  --button-hover: rgba(95,99,104,0.157);
+  --search: #f1f3f4;
+  --search-bar-icons: #5f6368;
+  --search-input: #5f6368;
+  --editor-border: transparent;
+  --editor-input: #5f5f5f;
+  --editor-content: #000000;
+  --editor-close-btn: #000000;
+  --editor-close-btn-hover: rgba(95, 99, 104, 0.039);
+  --editor-close-btn-focus: rgba(95, 99, 104, 0.161);
+  --bg-toolbar-border: #000000;
+  --bg-toolbar-divider: rgb(218,220,224);
+  --dropdown-menu-link: rgba(0, 0, 0, 0.08);
+  --more-btn-focus: rgba(95,99,104,0.157);
+  --note-card-selected: #000000;
+  --animated-header-icons: #1a73e8;
+  --note-editor-dialog-backdrop: rgb(32,33,36);
+  --editor-icons: #000000;
+  --fab-background: #ffffff;
+  --fab-text: #000000;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-icons: var(--icons);
+  --color-foreground-text: var(--foreground-text);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html.dark {
+  --background: #202124;
+  --foreground: #ededed;
+  --icons: #9aa0a6;
+  --hamburger: #ffffff;
+  --foreground-text: #ffffff;
+  --input-placeholder: #ffffff99;
+  --note-title-content: #ffffff;
+  --note-card: #202124;
+  --check-icon-div: #ffffff;
+  --note-card-border: #5f6368;
+  --check-icon: #6f6f6f;
+  --note-editor-background: #202124;
+  --note-editor-border: #5f6368;
+  --active-drawer-link: #41331c;
+  --header-shadow: rgb(95, 99, 104);
+  --section-label: rgb(95,99,104);
+  --page-drawer-link: #28292c;
+  --button-hover: rgba(232,234,237,.08);
+  --search: #f1f3f43d;
+  --search-bar-icons: #ffffffde;
+  --search-input: #ffffffde;
+  --editor-border: #5f6368;
+  --editor-input: #ffffff99;
+  --editor-content: #ffffff;
+  --editor-close-btn: #ffffff;
+  --editor-close-btn-hover: rgba(154, 160, 166, 0.039);
+  --editor-close-btn-focus: rgba(154, 160, 166, 0.161);
+  --bg-toolbar-border: #ffffff;
+  --bg-toolbar-divider: rgb(95, 99, 104);
+  --dropdown-menu-link: rgba(255, 255, 255, 0.16);
+  --more-btn-focus: #e8eaed1a;
+  --note-card-selected: #ffffff;
+  --animated-header-icons: #8ab4f8;
+  --note-editor-dialog-backdrop: rgba(32, 33, 36, 0.75);
+  --editor-icons: #9aa0a6;
+  --fab-background: #41331c;
+  --fab-text: #ffffff;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+html, body {
+  height: 100%;
+}
+
+.dark {
+  background-color: #202124;
+  color: #ffffffcc;
+}
+
+h1 {
+  font-size: 15pt !important;
+}
+
+h2 {
+  font-size: 13.5pt !important;
+}
+
+.page_body {
+  background: var(--background);
+  display: flex;
+  flex-direction: row;
+}
+
+.page_root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.page_content {
+  flex: 1;
+}
+
+.ProseMirror {
+  outline: none;
+}
+
+/* Placeholder (at the top) */
+p.is-editor-empty:first-child::before {
+  color: var(--editor-input);
+  font-size: 16px;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.fabx:hover {
+  background-color: red !important;
+}

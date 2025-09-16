@@ -1,0 +1,80 @@
+.selected_image_container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.selected_image {
+    width: 100%;
+    height: 100%;
+}
+
+.trash_filled_icon {
+    color: #ffffff;
+    width: 20px;
+    height: 20px;
+}
+
+.delete_image_button {
+    background-color: #000000;
+    width: 29.6px;
+    height: 29.6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    position: absolute;
+    bottom: 6px;
+    right: 10px;
+    cursor: pointer;
+    opacity: 0;
+    -webkit-transition: opacity .218s linear;
+    transition: opacity .218s linear;
+}
+
+.selected_image_container:hover .delete_image_button {
+    opacity: 0.63;
+}
+
+.image_display_container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3.2px;
+}
+
+.selected_image_container {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1 / 1; /* square tiles */
+    width: 100%;
+}
+
+.full {
+    grid-column: 1 / -1;
+    grid-row: span 2;
+}
+
+.selected_image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* One image → full width */
+.image_display_container > .selected_image_container:only-child {
+  grid-column: 1 / -1;
+  aspect-ratio: 2 / 1;
+}
+
+/* First child full width, but not when there are only 2 images */
+.image_display_container > .selected_image_container:first-child:not(:nth-last-child(1)):not(:nth-last-child(2)) {
+  grid-column: 1 / -1;
+  aspect-ratio: 2 / 1;
+}
+
+/* Last child full width if total is even and at least 4 items */
+.image_display_container > .selected_image_container:last-child:nth-child(even):not(:nth-child(2)) {
+  grid-column: 1 / -1;
+  aspect-ratio: 2 / 1;
+}
