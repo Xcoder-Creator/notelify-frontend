@@ -284,6 +284,9 @@
 
 .err_input_field {
     border-color: #e54e40;
+    border-width: 2px;
+    outline: none;
+    border-style: solid;
 }
 
 .bg_check_icon {

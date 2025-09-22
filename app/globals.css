@@ -38,6 +38,7 @@
   --editor-icons: #000000;
   --fab-background: #ffffff;
   --fab-text: #000000;
+  --illustration-text: #000000;
 }
 
 @theme inline {
@@ -87,6 +88,7 @@ html.dark {
   --editor-icons: #9aa0a6;
   --fab-background: #41331c;
   --fab-text: #ffffff;
+  --illustration-text: #ffffff;
 }
 
 body {
@@ -116,6 +118,7 @@ h2 {
   background: var(--background);
   display: flex;
   flex-direction: row;
+  height: 100%;
 }
 
 .page_root {

@@ -1,6 +1,9 @@
 import { ThemeReduxStateProps } from '@/types/theme-redux-state.types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+/* 
+    This redux slice manages the apps theme (light/dark)
+*/
 const initialState: ThemeReduxStateProps = {
     theme: 'dark'
 };

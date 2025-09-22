@@ -1,14 +1,12 @@
 "use client";
 
-import { useAppSelector } from '@/store/hooks';
-import dropdown_menu_styles from './DropdownMenu.module.css';
-import NoteEditorDropdownMenuProps from '@/types/note-editor/dropdown-menu.types';
+import dropdown_menu_styles from '../DropdownMenu.module.css';
+import DropdownMenuProps from '@/types/dropdown-menu.types';
 import { useEffect } from 'react';
+import menuList from '@/utils/note_editor/dropdownMenuList.util';
 
 /** This is the dropdown menu component for the note editor */
-export default function DropdownMenu({ dropdownMenuRef, moreButtonRef }: NoteEditorDropdownMenuProps){
-    const dropdownMenuOptions = useAppSelector((state) => state.dropdownMenu.menuList);
-
+export default function DropdownMenu({ dropdownMenuRef, moreOptionsButtonRef }: DropdownMenuProps){
     useEffect(() => {
         /*
             This method gets the current position of the more button relative to the viewport
@@ -17,7 +15,7 @@ export default function DropdownMenu({ dropdownMenuRef, moreButtonRef }: NoteEdi
         */
         const positionDropdownMenu = () => {
             // Get the button and dropdown menu elements from refs
-            const button = moreButtonRef.current;
+            const button = moreOptionsButtonRef.current;
             const dropdownMenu = dropdownMenuRef.current;
 
             // Exit if either the button or the dropdown menu is not mounted yet
@@ -62,12 +60,12 @@ export default function DropdownMenu({ dropdownMenuRef, moreButtonRef }: NoteEdi
             window.removeEventListener('scroll', positionDropdownMenu);
             //---------------------------------------------------------------------------
         };
-    }, [moreButtonRef]);
+    }, [moreOptionsButtonRef]);
 
     return (
         <div ref={dropdownMenuRef} className={dropdown_menu_styles.container}>
             {
-                dropdownMenuOptions.map((option, index) => (
+                menuList.map((option, index) => (
                     <div tabIndex={0} key={index} className={dropdown_menu_styles.link}>{option.title}</div>
                 ))
             }

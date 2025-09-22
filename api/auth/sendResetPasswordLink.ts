@@ -1,4 +1,4 @@
-import { AppDispatch } from "@/store";
+import { store } from "@/store";
 import { updateErrMsgAndError, updateSuccessMsgAndSuccess, updateWarningMsgAndWarning } from "@/store/slices/userAuthSlice";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -13,21 +13,20 @@ interface ForgotPasswordDetails {
 
 /**
  * This method sends a reset password link to the user through email.
- * @param dispatch - The redux dispatch function
  * @param forgotPasswordDetails - The forgot password details needed to send a reset password link to the user
  * @param router - The next/navigation router object
  * @param controllerRef - The abort controller reference
  * @return void
  */
-const sendResetPasswordLink = async (dispatch: AppDispatch, forgotPasswordDetails: ForgotPasswordDetails, router: ReturnType<typeof useRouter>, controllerRef: React.RefObject<AbortController | null>) => {
+const sendResetPasswordLink = async (forgotPasswordDetails: ForgotPasswordDetails, router: ReturnType<typeof useRouter>, controllerRef: React.RefObject<AbortController | null>) => {
     // Cancel any pending requests and reset the abort controller
     controllerRef.current?.abort();
     controllerRef.current = new AbortController();
     
     // Clear and disable the error, success and info alert when the user tries to login
-    dispatch(updateErrMsgAndError({ errMsg: null, error: false }));
-    dispatch(updateSuccessMsgAndSuccess({ successMsg: null, success: false }));
-    dispatch(updateWarningMsgAndWarning({ warningMsg: null, warning: false }));
+    store.dispatch(updateErrMsgAndError({ errMsg: null, error: false }));
+    store.dispatch(updateSuccessMsgAndSuccess({ successMsg: null, success: false }));
+    store.dispatch(updateWarningMsgAndWarning({ warningMsg: null, warning: false }));
 
     try {
         const res = await axios.post(`/api/auth/forgot-password`, forgotPasswordDetails,
@@ -39,9 +38,9 @@ const sendResetPasswordLink = async (dispatch: AppDispatch, forgotPasswordDetail
             }
         );
 
-        dispatch(updateErrMsgAndError({ errMsg: null, error: false }));
-        dispatch(updateWarningMsgAndWarning({ warningMsg: null, warning: false }));
-        dispatch(updateSuccessMsgAndSuccess({ successMsg: res.data.message, success: true }));
+        store.dispatch(updateErrMsgAndError({ errMsg: null, error: false }));
+        store.dispatch(updateWarningMsgAndWarning({ warningMsg: null, warning: false }));
+        store.dispatch(updateSuccessMsgAndSuccess({ successMsg: res.data.message, success: true }));
     } catch (error: any) {
         /*
             Check if the error is coming from a canceled request
@@ -56,16 +55,16 @@ const sendResetPasswordLink = async (dispatch: AppDispatch, forgotPasswordDetail
         */
         if (axios.isAxiosError(error) && error.response) {
             if (error.status === 403){
-                dispatch(updateWarningMsgAndWarning({ warningMsg: error.response.data.message, warning: true }));
+                store.dispatch(updateWarningMsgAndWarning({ warningMsg: error.response.data.message, warning: true }));
             } else {
                 if (error.response.data.message){
-                    dispatch(updateErrMsgAndError({ errMsg: error.response.data.message, error: true }));
+                    store.dispatch(updateErrMsgAndError({ errMsg: error.response.data.message, error: true }));
                 } else {
-                    dispatch(updateErrMsgAndError({ errMsg: "Network error occured, try again later", error: true }));
+                    store.dispatch(updateErrMsgAndError({ errMsg: "Network error occured, try again later", error: true }));
                 }
             }
         } else {
-            dispatch(updateErrMsgAndError({ errMsg: "Network error occured, try again later", error: true }));
+            store.dispatch(updateErrMsgAndError({ errMsg: "Network error occured, try again later", error: true }));
         }
     }
 }

@@ -1,4 +1,4 @@
-import { AppDispatch, store } from "@/store";
+import { store } from "@/store";
 import { updateMsg, updateOpen } from "@/store/slices/snackbarSlice";
 import { updateLoadingScreen, updateUserData } from "@/store/slices/userAuthSlice";
 import axios from "axios";
@@ -6,13 +6,12 @@ import { useRouter } from "next/navigation";
 
 /**
  * This method will be used for user authentication.
- * @param dispatch - The redux dispatch function
  * @param router - The next/navigation router object
  * @param page - The page that called the userAuth method
  * @param controllerRef - The abort controller reference
  * @return void
  */
-const userAuth = async (dispatch: AppDispatch, router: ReturnType<typeof useRouter>, page: string, controllerRef: React.RefObject<AbortController | null>) => {
+const userAuth = async (router: ReturnType<typeof useRouter>, page: string, controllerRef: React.RefObject<AbortController | null>) => {
     // Cancel any pending requests and reset the abort controller
     controllerRef.current?.abort();
     controllerRef.current = new AbortController();
@@ -41,19 +40,18 @@ const userAuth = async (dispatch: AppDispatch, router: ReturnType<typeof useRout
             }
         );
 
-        dispatch(updateUserData({ userData: res.data.userData }));
+        store.dispatch(updateUserData({ userData: res.data.userData }));
 
         if (page === "auth" || page === "verify_pending"){
             router.push('/'); // Navigate to the home page
         } else if (page === "main"){
-            dispatch(updateLoadingScreen({ loadingScreen: false })); // Hide the screen loader
+            store.dispatch(updateLoadingScreen({ loadingScreen: false })); // Hide the screen loader
         }
     } catch (error) {
         /*
             Check if the error is coming from a canceled request
         */
         if (axios.isCancel(error)) {
-            console.log("User auth canceled");
             return;
         }
 
@@ -64,22 +62,22 @@ const userAuth = async (dispatch: AppDispatch, router: ReturnType<typeof useRout
         if (axios.isAxiosError(error) && error.response) {
             if (error.response.data.message){
                 if (error.response.data.isLoggedIn){
-                    dispatch(updateOpen(true));
-                    dispatch(updateMsg(error.response.data.message));
+                    store.dispatch(updateOpen(true));
+                    store.dispatch(updateMsg(error.response.data.message));
                 } else {
                     if (page === "auth"){
-                        dispatch(updateLoadingScreen({ loadingScreen: false })); // Hide the loading screen
+                        store.dispatch(updateLoadingScreen({ loadingScreen: false })); // Hide the loading screen
                     } else if (page === "main" || page === "verify_pending"){
                         router.push('/auth/login');
                     }
                 }
             } else {
-                dispatch(updateOpen(true));
-                dispatch(updateMsg("A network error has occured, please try again later!"));
+                store.dispatch(updateOpen(true));
+                store.dispatch(updateMsg("A network error has occured, please try again later!"));
             }
         } else {
-            dispatch(updateOpen(true));
-            dispatch(updateMsg("A network error has occured, please try again later!"));
+            store.dispatch(updateOpen(true));
+            store.dispatch(updateMsg("A network error has occured, please try again later!"));
         }
     }
 }

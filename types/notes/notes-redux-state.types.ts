@@ -1,79 +1,82 @@
 /** Interface for each note */
 export interface NoteProps {
     /** The ID of the note */
-    id: number;
+    noteID: string;
+
+    /** The ID of the user who created the note */
+    userID: number;
 
     /** The title of the note */
     title: string;
 
     /** The content of the note in the form of a html string */
-    notecontent: string;
+    content: string;
 
-    /** Wether the note is pinned or not */
-    isPinned: boolean;
+    /** Whether the note is a draft or not */
+    isDraft: boolean;
+
+    /** Whether the note is pinned or not */
+    pinned: boolean;
 
     /** The ID of the background theme for the note if available */
-    bgThemeID: number,
+    bgColor: number,
     
     /** The ID of the wallpaper for the note if available */
-    wallpaperID: number,
+    wallpaper: number,
 
     /** The timestamp at which the note was created */
-    createdTimestamp: string;
+    createdAt: string;
 
     /** The timestamp at which the note was edited after creation */
-    editedTimestamp: string | null;
+    updatedAt: string;
+
+    /** The array of attachments for the note */
+    attachments: Array<{
+        /** The ID of the attachment */
+        attachmentID: number;
+
+        /** The URL of the attachment */
+        fileURL: string;
+
+        /** The type of the attachment */
+        fileType: string;
+    }>;
 }
 
 export interface UpdateSelectedNotesProps {
     /** To know if the user is selecting (select) or deselecting (deselect) a note */
-    action: string;
+    action: "select" | "deselect" ;
 
     /** The ID of the note that the user is either selecting or deselecting */
-    noteID: number;
-
-    /** Index of the selected note */
-    index: number;
-}
-
-/** Interface for the selected note */
-interface SelectedNoteProps {
-    /** The ID of the selected note */
-    id: number;
-
-    /** Index of the selected note */
-    index: number; 
+    noteID: string;
 }
 
 /** Interface for the notes redux state */
 export interface NotesReduxStateProps {
-    /** The users notes */
-    notes: Array<NoteProps>;
+    /** The users pinned notes */
+    pinnedNotes: Array<NoteProps>;
+
+    /** The users other notes (Notes that are not pinned) */
+    othersNotes: Array<NoteProps>;
+
+    /** The pinned page number */
+    pinnedPage: number;
+
+    /** The others page number */
+    othersPage: number;
+
+    /** The page size */
+    pageSize: number;
 
     /** An array that keeps track of all the selected notes */
-    notesSelected: Array<SelectedNoteProps>;
+    notesSelected: Array<{
+        /** The ID of the selected note */
+        noteID: string;
+    }>;
 
     /** The ID of the note that was currently deselected */
-    currentDeselectedNoteID: null | number;
+    currentDeselectedNoteID: null | string;
 
-    /** The state of the note editor dialog */
-    noteEditorDialog: boolean;
-
-    /** 
-     * The title string of a note to be displayed in the
-     * note editor dialog
-     */
-    noteEditorDialogTitle: string | null;
-
-    /** 
-     * The html content of a note to be rendered in the
-     * note editor dialog
-     */
-    noteEditorDialogContent: string | null;
-
-    /** The state of the dropdown menu for the note editor dialog */
-    dialogDropdownMenu: boolean;
-
-    /** The state of the bottom sheet for the note editor dialog */
-    dialogBottomSheet: boolean;
+    /** The state of the bottomsheet */
+    bottomSheet: boolean;
 }

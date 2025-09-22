@@ -14,7 +14,7 @@ import React from "react";
 
 /**
  * This component is the mobile drawer that is only available when
- * the user switches to a mobile view
+ * the user switches to a mobile view.
  */
 export default function MobileDrawer() {
     const dispatch = useAppDispatch(); // The Redux dispatch function
@@ -29,7 +29,7 @@ export default function MobileDrawer() {
     const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
         const deltaX = e.touches[0].clientX - touchStartX.current;
         if (deltaX < -50) { // swipe left threshold
-            dispatch(toggleMobileDrawer({ value: false }));
+            dispatch(toggleMobileDrawer(false));
         }
     };
 
@@ -38,7 +38,7 @@ export default function MobileDrawer() {
         <Box 
             sx={{ width: 288 }} 
             role="presentation" 
-            onClick={() => dispatch(toggleMobileDrawer({ value: false }))}
+            onClick={() => dispatch(toggleMobileDrawer(false))}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
         >
@@ -70,8 +70,8 @@ export default function MobileDrawer() {
         <SwipeableDrawer
             anchor="left"
             open={mobileDrawerState}
-            onClose={() => dispatch(toggleMobileDrawer({ value: false }))}
-            onOpen={() => dispatch(toggleMobileDrawer({ value: true }))}
+            onClose={() => dispatch(toggleMobileDrawer(false))}
+            onOpen={() => dispatch(toggleMobileDrawer(true))}
             disableSwipeToOpen={false}
             swipeAreaWidth={0}
             sx={{

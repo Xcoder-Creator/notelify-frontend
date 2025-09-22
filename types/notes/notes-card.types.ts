@@ -1,4 +1,3 @@
-import { RefObject } from "react";
 import { NoteProps } from "./notes-redux-state.types";
 
 /**
@@ -10,9 +9,6 @@ interface NotesCardProps {
 
     /** The index position of the note */
     index: number;
-
-    /** The theme of the app */
-    theme: string;
 }
 
 export default NotesCardProps;

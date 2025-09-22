@@ -1,5 +1,5 @@
 /** 
- * An object that contains different breakpoints for the masonry grid layout of the notes
+ * An object that contains different breakpoints for the masonry layout of the notes
  */
 const masonryBreakpoints = {
     default: 21,

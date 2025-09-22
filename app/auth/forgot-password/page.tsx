@@ -5,7 +5,7 @@ import auth_styles from '@/components/auth/Auth.module.css';
 import find_your_account_styles from '@/components/auth/FindYourAccount.module.css';
 import Image from "next/image";
 import Link from "next/link";
-import forceLightTheme from "@/lib/forceLightTheme";
+import forceLightTheme from "@/lib/theme/forceLightTheme";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { updateErrMsgAndError, updateLoadingScreen, updateSuccessMsgAndSuccess, updateWarningMsgAndWarning } from "@/store/slices/userAuthSlice";
 import { useRouter } from "next/navigation";
@@ -46,20 +46,20 @@ export default function ForgotPassword() {
     });
 
     // This method is called when the form validation is successfull
-    const onSubmit = async (data: FormData) => await sendResetPasswordLink(dispatch, data, router, controllerRef);
+    const onSubmit = async (data: FormData) => await sendResetPasswordLink(data, router, controllerRef);
 
     // Button is disabled if any errors exist
     const hasErrors = Object.keys(errors).length > 0;
     
     useEffect(() => {
-        forceLightTheme(dispatch);
+        forceLightTheme();
 
         if (userData){
             dispatch(updateLoadingScreen({ loadingScreen: true }));
             router.push('/');
         } else {
             const run = async () => {
-                await userAuth(dispatch, router, "auth", controllerRef);
+                await userAuth(router, "auth", controllerRef);
             }
             run();
         }
@@ -68,6 +68,9 @@ export default function ForgotPassword() {
             // Cancel any pending requests
             controllerRef.current?.abort();
             controllerRef.current = null;
+            dispatch(updateErrMsgAndError({ errMsg: null, error: false }));
+            dispatch(updateSuccessMsgAndSuccess({ successMsg: null, success: false }));
+            dispatch(updateWarningMsgAndWarning({ warningMsg: null, warning: false }));
         }
     }, []);
 
@@ -85,7 +88,7 @@ export default function ForgotPassword() {
                         height={65}
                     />
                     
-                    <p className={auth_styles.title_text}>Forgot your password?</p>
+                    <p className={auth_styles.title_text}>Forgot Your Password?</p>
                     
                     <p className={auth_styles.sub_txt}>Provide your email or username below so that we can send you a password reset link.</p>
 

@@ -14,7 +14,7 @@ import registerUser from "@/api/auth/registerUser";
 import { Alert, CircularProgress } from "@mui/material";
 import { updateErrMsgAndError, updateLoadingScreen, updateSuccessMsgAndSuccess } from "@/store/slices/userAuthSlice";
 import { useRouter } from "next/navigation";
-import forceLightTheme from "@/lib/forceLightTheme";
+import forceLightTheme from "@/lib/theme/forceLightTheme";
 import userAuth from "@/api/auth/userAuth";
 import ScreenLoader from "@/components/ScreenLoader";
 
@@ -47,20 +47,20 @@ export default function Signup() {
     });
 
     // This method is called when the form validation is successfull
-    const onSubmit = async (data: FormData) => await registerUser(dispatch, data, router, controllerRef);
+    const onSubmit = async (data: FormData) => await registerUser(data, router, controllerRef);
 
     // Button is disabled if any errors exist
     const hasErrors = Object.keys(errors).length > 0;
 
     useEffect(() => {
-        forceLightTheme(dispatch); // Force light mode
+        forceLightTheme(); // Force light mode
         
         if (userData){
             dispatch(updateLoadingScreen({ loadingScreen: true }));
             router.push('/');
         } else {
             const run = async () => {
-                await userAuth(dispatch, router, "auth", controllerRef);
+                await userAuth(router, "auth", controllerRef);
             }
             run();
         }
@@ -69,6 +69,8 @@ export default function Signup() {
             // Cancel any pending requests
             controllerRef.current?.abort();
             controllerRef.current = null;
+            dispatch(updateErrMsgAndError({ errMsg: null, error: false }));
+            dispatch(updateSuccessMsgAndSuccess({ successMsg: null, success: false }));
         }
     }, []);
 

@@ -8,7 +8,7 @@ interface NotesGridProps {
     dropdownMenuRef: RefObject<HTMLDivElement | null>; 
     
     /** The reference to the more button */
-    moreButtonRef: RefObject<HTMLButtonElement | null>;
+    moreOptionsButtonRef: RefObject<HTMLButtonElement | null>;
 }
 
 export default NotesGridProps;

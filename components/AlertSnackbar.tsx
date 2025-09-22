@@ -5,24 +5,7 @@ import React from "react";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { updateOpen } from "@/store/slices/snackbarSlice";
 import { Alert } from '@mui/material';
-
-interface AlertSnackbarProps {
-    /**
-     * The number of milliseconds to wait before automatically calling the onClose function. 
-     * onClose should then set the state of the open prop to hide the Snackbar. 
-     * This behavior is disabled by default with the null value.
-     */
-    autoHideDuration: number | null | undefined;
-
-    /** Vertical alignment of the snackbar */
-    vertical: "bottom" | "top";
-
-    /** Horizontal alignment of the snackbar */
-    horizontal: "center" | "left" | "right";
-
-    /** The severity of the alert snackbar */
-    severity: "error" | "warning" | "info" | "success";
-}
+import { AlertSnackbarProps } from '@/types/alert-snackbar.types';
 
 /**
  * The alert snackbar made from MUI snackbar component

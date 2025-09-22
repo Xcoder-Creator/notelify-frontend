@@ -12,32 +12,30 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { clearSelectedNotes } from '@/store/slices/notesSlice';
 import { useEffect, useRef, useState } from 'react';
 import PinnedSVG from '../svg-comp/Pinned';
-import BackgroundToolbar from './BackgroundToolbar';
-import toggleAnimatedHeaderActions from '@/lib/notes/toggleAnimatedHeaderActions';
-import { updateActiveBgTheme, updateActiveWallpaper } from '@/store/slices/header/animatedHeaderBackgroundToolbarSlice';
-import { resetToolbar } from '@/store/slices/note-editor/backgroundToolbarSlice';
 import AppTooltip from '../AppTooltip';
 import { useMediaQuery } from 'react-responsive';
+import { resetBackgroundOptionsToolbar, toggleBackgroundOptionsToolbarState, updateActiveBgTheme, updateActiveWallpaper } from '@/store/slices/note_editor/backgroundOptionsToolbarSlice';
+import BackgroundOptionsToolbar from './BackgroundOptionsToolbar';
+import toggleAnimatedHeaderActions from '@/lib/notes/toggleAnimatedHeaderActions';
 
 /** The animated header */
 export default function AnimatedHeader({ hideAnimatedHeader, animatingOut, scrollDirection }: AnimatedHeaderProps){
     const dispatch = useAppDispatch();
     const notesSelected = useAppSelector((state) => state.notes.notesSelected);
-    const notes = useAppSelector((state) => state.notes.notes);
-    const dialogBottomsheet = useAppSelector((state) => state.notes.dialogBottomSheet);
+    const pinnedNotes = useAppSelector((state) => state.notes.pinnedNotes);
+    const othersNotes = useAppSelector((state) => state.notes.othersNotes);
+    const backgroundOptionsToolbar = useAppSelector((state) => state.backgroundOptionsToolbar.state); // The state of the background options toolbar
     const [recentNoOfNotesSelected, setRecentNoOfNotesSelected] = useState(0); // This state tracks the recent number of notes selected
     const [pinAndUnpinState, setpinAndUnpinState] = useState('pin');
-    const [backgroundToolbarDisplay, setBackgroundToolbarDisplay] = useState(false);
-    const backgroundToolbarRef = useRef<HTMLDivElement>(null);
+    const backgroundOptionsToolbarRef = useRef<HTMLDivElement>(null);
     const backgroundOptionsButtonRef = useRef<HTMLButtonElement>(null);
     const breakPointForBottomSheet = useMediaQuery({ query: '(max-width: 490px)' });
-    backgroundToolbarRef.current
 
     // This method closes the header
     const closeHeader = () => {
         hideAnimatedHeader();
         dispatch(clearSelectedNotes());
-        dispatch(resetToolbar());
+        dispatch(resetBackgroundOptionsToolbar());
     }
 
     useEffect(() => {
@@ -48,13 +46,13 @@ export default function AnimatedHeader({ hideAnimatedHeader, animatingOut, scrol
 
             // Don't close if the click is inside the toolbar OR the background options button
             if (
-                backgroundToolbarRef.current?.contains(target) ||
+                backgroundOptionsToolbarRef.current?.contains(target) ||
                 backgroundOptionsButtonRef.current?.contains(target)
             ) {
                 return;
             }
 
-            setBackgroundToolbarDisplay(false);
+            dispatch(toggleBackgroundOptionsToolbarState(false));
         }
 
         document.addEventListener('mousedown', handleClickOutsideForBackgroundToolbar); // Listen for mouse clicks outside the background toolbar
@@ -71,18 +69,35 @@ export default function AnimatedHeader({ hideAnimatedHeader, animatingOut, scrol
             setRecentNoOfNotesSelected(notesSelected.length);
 
             let mostRecentSelectedNoteIndex = notesSelected.length - 1; // Get the most recent selected note index
-            let noteID = notesSelected[mostRecentSelectedNoteIndex].id; // Get the ID of the most recent selected note
-            const extractedNoteData = notes.find(note => note.id === noteID); // Extract the most recent selected note data
-            
-            // Check if the extracted note data is available
-            if (extractedNoteData){
-                dispatch(updateActiveBgTheme(extractedNoteData.bgThemeID));
-                dispatch(updateActiveWallpaper(extractedNoteData.wallpaperID));
+            let noteID = notesSelected[mostRecentSelectedNoteIndex].noteID; // Get the ID of the most recent selected note
+            const extractedPinnedNoteData = pinnedNotes.find(note => note.noteID === noteID); // Extract the most recent selected  note data
+            const extractedOthersNoteData = othersNotes.find(note => note.noteID === noteID); // Extract the most recent selected note data
 
-                if (extractedNoteData.isPinned){
-                    setpinAndUnpinState('unpin');
-                } else {
-                    setpinAndUnpinState('pin');
+            if (extractedPinnedNoteData){
+                // Check if the extracted note data is available
+                if (extractedPinnedNoteData){
+                    dispatch(updateActiveBgTheme({ themeID: extractedPinnedNoteData.bgColor }));
+                    dispatch(updateActiveWallpaper({ wallpaperID: extractedPinnedNoteData.wallpaper }));
+
+                    if (extractedPinnedNoteData.pinned){
+                        setpinAndUnpinState('unpin');
+                    } else {
+                        setpinAndUnpinState('pin');
+                    }
+                }
+            }
+
+            if (extractedOthersNoteData){
+                // Check if the extracted note data is available
+                if (extractedOthersNoteData){
+                    dispatch(updateActiveBgTheme({ themeID: extractedOthersNoteData.bgColor }));
+                    dispatch(updateActiveWallpaper({ wallpaperID: extractedOthersNoteData.wallpaper }));
+
+                    if (extractedOthersNoteData.pinned){
+                        setpinAndUnpinState('unpin');
+                    } else {
+                        setpinAndUnpinState('pin');
+                    }
                 }
             }
         }
@@ -123,17 +138,15 @@ export default function AnimatedHeader({ hideAnimatedHeader, animatingOut, scrol
                     }
 
                     <AppTooltip title="Background options" >
-                        <button ref={backgroundOptionsButtonRef} onClick={() => toggleAnimatedHeaderActions(2, backgroundToolbarDisplay, setBackgroundToolbarDisplay, breakPointForBottomSheet, dispatch, dialogBottomsheet)} className={[header_styles.header_action_button, header_styles.mlr_6].join(' ')}>
+                        <button ref={backgroundOptionsButtonRef} onClick={() => toggleAnimatedHeaderActions(2, breakPointForBottomSheet)} className={[header_styles.header_action_button, header_styles.mlr_6].join(' ')}>
                             <PaletteSVG className={animated_header_styles.animated_header_icon} />
                         </button>
                     </AppTooltip>
 
                     {
-                        backgroundToolbarDisplay && backgroundOptionsButtonRef.current && breakPointForBottomSheet === false ?
-                            <BackgroundToolbar 
-                                backgroundToolbarDisplay={backgroundToolbarDisplay}
-                                setBackgroundToolbarDisplay={setBackgroundToolbarDisplay}
-                                backgroundToolbarRef={backgroundToolbarRef}
+                        backgroundOptionsToolbar && backgroundOptionsButtonRef.current && breakPointForBottomSheet === false ?
+                            <BackgroundOptionsToolbar
+                                backgroundOptionsToolbarRef={backgroundOptionsToolbarRef}
                                 backgroundOptionsButtonRef={backgroundOptionsButtonRef}
                             />
                         :   null

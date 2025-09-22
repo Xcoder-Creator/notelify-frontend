@@ -5,7 +5,7 @@ import auth_styles from '@/components/auth/Auth.module.css';
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useParams, useRouter } from "next/navigation";
 import { updateLoadingScreen } from "@/store/slices/userAuthSlice";
-import forceLightTheme from "@/lib/forceLightTheme";
+import forceLightTheme from "@/lib/theme/forceLightTheme";
 import ScreenLoader from "@/components/ScreenLoader";
 import BackgroundCheckSVG from "@/components/svg-comp/BackgroundCheck";
 import Link from "next/link";
@@ -26,13 +26,13 @@ export default function VerifyAccount() {
     const params = useParams();
 
     useEffect(() => {
-        forceLightTheme(dispatch);
+        forceLightTheme();
         dispatch(updateLoadingScreen({ loadingScreen: true }));
 
         const token = params.token; // Get the token from route param
 
         const run = async () => {
-            await verifyAccount(dispatch, router, token, setError, setErrorTitle, setErrMsg, controllerRef);
+            await verifyAccount(router, token, setError, setErrorTitle, setErrMsg, controllerRef);
         }
 
         run();

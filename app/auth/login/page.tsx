@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useRouter } from "next/navigation";
 import { Alert, CircularProgress } from "@mui/material";
 import { updateErrMsgAndError, updateLoadingScreen } from "@/store/slices/userAuthSlice";
-import forceLightTheme from "@/lib/forceLightTheme";
+import forceLightTheme from "@/lib/theme/forceLightTheme";
 import ScreenLoader from "@/components/ScreenLoader";
 import userAuth from "@/api/auth/userAuth";
 
@@ -44,20 +44,20 @@ export default function Login() {
     });
 
     // This method is called when the form validation is successfull
-    const onSubmit = async (data: FormData) => await loginUser(dispatch, data, router, controllerRef);
+    const onSubmit = async (data: FormData) => await loginUser(data, router, controllerRef);
 
     // Button is disabled if any errors exist
     const hasErrors = Object.keys(errors).length > 0;
 
     useEffect(() => {
-        forceLightTheme(dispatch);
+        forceLightTheme();
 
         if (userData){
             dispatch(updateLoadingScreen({ loadingScreen: true }));
             router.push('/');
         } else {
             const run = async () => {
-                await userAuth(dispatch, router, "auth", controllerRef);
+                await userAuth(router, "auth", controllerRef);
             }
             run();
         }

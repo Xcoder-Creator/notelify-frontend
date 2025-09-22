@@ -1,25 +1,31 @@
 "use client";
 
-import Drawer from "@/components/drawer/Drawer";
-import Header from "@/components/header/Header";
-import NoteEditorMain from "@/components/note_editor/Main";
-import note_editor_styles from "@/components/note_editor/NoteEditor.module.css";
 import React, { useEffect, useRef } from "react";
-import note_styles from '../components/notes/Notes.module.css';
-import NotesGrid from "@/components/notes/NotesGrid";
-import SnackbarComp from "@/components/SnackbarComp";
-import ClientComp2 from "@/components/home/ClientComp2";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useRouter } from "next/navigation";
 import userAuth from "@/api/auth/userAuth";
 import ScreenLoader from "@/components/ScreenLoader";
-import handleTheme from "@/lib/handleTheme";
+import handleTheme from "@/lib/theme/handleTheme";
+import { updateLoadingScreen } from "@/store/slices/userAuthSlice";
+import Header from "@/components/header/Header";
+import Drawer from "@/components/drawer/Drawer";
 import { useMediaQuery } from "react-responsive";
 import MobileDrawer from "@/components/drawer/MobileDrawer";
-import { updateLoadingScreen } from "@/store/slices/userAuthSlice";
+import note_editor_styles from '@/components/note_editor/NoteEditor.module.css';
+import NoteEditorMain from "@/components/note_editor/Main";
+import { updateEditorContent } from "@/store/slices/note_editor/editorSlice";
+import { useEditor } from "@tiptap/react";
+import StarterKit from '@tiptap/starter-kit';
+import { Placeholder } from '@tiptap/extensions';
+import { updateFormattingOptions } from "@/store/slices/note_editor/formattingOptionsToolbarSlice";
+import { updateRedoButton, updateUndoButton } from "@/store/slices/note_editor/actionToolbarSlice";
+import SnackbarComp from "@/components/SnackbarComp";
+import NotesLayout from "@/components/notes/NotesLayout";
+import note_styles from '@/components/notes/NotesLayout.module.css';
+import NoteEditorPlaceholder from "@/components/note_editor/NoteEditorPlaceholder";
 
 /**
- * This is the home page
+ * This is the home page.
  */
 export default function Home() {
     const dispatch = useAppDispatch();
@@ -27,10 +33,13 @@ export default function Home() {
     const loadingScreen = useAppSelector((state) => state.userAuth.loadingScreen);
     const router = useRouter();
     const controllerRef = useRef<AbortController | null>(null);
-    const breakPointForDrawer = useMediaQuery({ query: '(max-width: 1500px)' }); // This breakpoint defines when the mobile drawer can become visible/rendered
+    const editorContent = useAppSelector((state) => state.editor.content);
+    const isFocused = useAppSelector((state) => state.editor.isFocused); // A redux state to track if the editor is focused or not
+    const breakPointToRenderMobileDrawer = useMediaQuery({ query: '(max-width: 1500px)' }); // This breakpoint defines when the mobile drawer can become visible/rendered
+    const noteEditorPlaceholderRef = useRef<HTMLDivElement>(null); // The note editor placeholder ref
 
     useEffect(() => {
-        handleTheme(dispatch); // Handle app theme
+        handleTheme(); // Handle app theme
 
         // Check if the user is logged in the redux state
         if (userData){
@@ -39,7 +48,7 @@ export default function Home() {
             dispatch(updateLoadingScreen({ loadingScreen: true }));
 
             const run = async () => {
-                await userAuth(dispatch, router, "main", controllerRef);
+                await userAuth(router, "main", controllerRef);
             }
 
             run();
@@ -52,12 +61,44 @@ export default function Home() {
         }
     }, []);
 
-    if (loadingScreen) return <ScreenLoader />;
+    // The editor instance
+    const editor = useEditor({
+        extensions: [
+            StarterKit,
+            Placeholder.configure({ placeholder: 'Take a note...' })
+        ],
+        content: editorContent,
+        immediatelyRender: false,
+        onSelectionUpdate: ({ editor }) => {
+            dispatch(updateFormattingOptions({
+                headerOne: editor.isActive('heading', { level: 1 }),
+                headerTwo: editor.isActive('heading', { level: 2 }),
+                normalText: editor.isActive('paragraph'),
+                bold: editor.isActive('bold'),
+                italic: editor.isActive('italic'),
+                underline: editor.isActive('underline'),
+            }));
+        },
+        onTransaction: ({ editor }) => {
+            dispatch(updateUndoButton(editor.can().undo()));
+            dispatch(updateRedoButton(editor.can().redo()));
+        },
+        onCreate: ({ editor }) => {
+            if (isFocused) {
+                editor.commands.focus('end');
+            }
+        },
+        onUpdate: ({ editor }) => {
+            const html = editor.getHTML();
+            dispatch(updateEditorContent(html));
+        }
+    });
+
+    //if (loadingScreen) return <ScreenLoader />;
 
     return (
         <div className="page_root">
-            {/* ----Render the mobile drawer---- */}
-            {breakPointForDrawer && <MobileDrawer />}
+            {breakPointToRenderMobileDrawer && <MobileDrawer />}
 
             <Header />
 
@@ -66,18 +107,31 @@ export default function Home() {
 
                 <div className="page_content">
                     <div className={note_editor_styles.container}>
-                        <NoteEditorMain />
+                        {
+                            isFocused ?
+                                <NoteEditorMain 
+                                    editor={editor} 
+                                    noteEditorPlaceholderRef={noteEditorPlaceholderRef}
+                                />
+                            :   <NoteEditorPlaceholder
+                                    editor={editor}
+                                    noteEditorPlaceholderRef={noteEditorPlaceholderRef}
+                                />
+                        }
                     </div>
 
                     <div className={note_styles.container}>
-                        <NotesGrid />
+                        <NotesLayout />
                     </div>
                 </div>
             </div>
 
-            <ClientComp2 />
-
-            <SnackbarComp autoHideDuration={3000} vertical="bottom" horizontal="left" undoBtn={true} />
+            <SnackbarComp 
+                autoHideDuration={3000} 
+                vertical="bottom" 
+                horizontal="left" 
+                undoBtn={true} 
+            />
         </div>
     );
 }

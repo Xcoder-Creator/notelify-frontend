@@ -5,7 +5,7 @@ import auth_styles from '@/components/auth/Auth.module.css';
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useRouter } from "next/navigation";
 import { updateEmailForAccountVerification, updateErrMsgAndError, updateLoadingScreen, updateSuccessMsgAndSuccess, updateVerifyPending } from "@/store/slices/userAuthSlice";
-import forceLightTheme from "@/lib/forceLightTheme";
+import forceLightTheme from "@/lib/theme/forceLightTheme";
 import ScreenLoader from "@/components/ScreenLoader";
 import BackgroundCheckSVG from "@/components/svg-comp/BackgroundCheck";
 import Link from "next/link";
@@ -33,19 +33,19 @@ export default function VerifyPending() {
     const resendLink = async () => {
         if (!isSubmitting){
             setIsSubmitting(true);
-            await resendVerificationLink(dispatch, controllerRef, setIsSubmitting);
+            await resendVerificationLink(controllerRef, setIsSubmitting);
         }
     }
 
     useEffect(() => {
-        forceLightTheme(dispatch);
+        forceLightTheme();
         
         if (verifyPending && emailForAccountVerification){
             dispatch(updateLoadingScreen({ loadingScreen: false }));
         } else {
             dispatch(updateLoadingScreen({ loadingScreen: true }));
             const run = async () => {
-                await userAuth(dispatch, router, "verify_pending", controllerRef);
+                await userAuth(router, "verify_pending", controllerRef);
             }
             run();
         }

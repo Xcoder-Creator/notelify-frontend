@@ -1,6 +1,9 @@
 import SnackbarReduxStateProps from '@/types/snackbar-redux-state.types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+/* 
+    This redux slice manages the state of the snackbar
+*/
 const initialState: SnackbarReduxStateProps = {
     open: false,
     msg: ''

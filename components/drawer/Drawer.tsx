@@ -11,7 +11,7 @@ import { useAppSelector } from '@/store/hooks';
 import { useState } from 'react';
 
 /**
- * This is the navigation drawer component
+ * This is the navigation drawer component.
  */
 export default function Drawer() {
     const breakPointForDrawer = useMediaQuery({ query: '(max-width: 1500px)' });

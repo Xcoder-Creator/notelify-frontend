@@ -9,35 +9,35 @@ import CloseSVG from '../svg-comp/Close';
 import RefreshSVG from '../svg-comp/Refresh';
 import ListSVG from '../svg-comp/List';
 import SettingsSVG from '../svg-comp/Settings';
-import { useEffect, useRef, useState } from 'react';
-import AnimatedHeader from './AnimatedHeader';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { updateIsAnimatedHeaderVisible } from '@/store/slices/header/headerSlice';
-import { useMediaQuery } from 'react-responsive'
-import { toggleCollapsedDrawer, toggleMobileDrawer } from '@/store/slices/drawerSlice';
+import { useMediaQuery } from 'react-responsive';
 import AppTooltip from '../AppTooltip';
-import toggleAppTheme from '@/lib/toggleAppTheme';
+import { toggleCollapsedDrawer, toggleMobileDrawer } from '@/store/slices/drawerSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { useEffect, useRef, useState } from 'react';
+import { updateIsAnimatedHeaderVisible } from '@/store/slices/headerSlice';
+import AnimatedHeader from './AnimatedHeader';
+import { resetBackgroundOptionsToolbar } from '@/store/slices/note_editor/backgroundOptionsToolbarSlice';
 
 /**
- * This is the header component
+ * This is the header component.
  */
 export default function Header() {
+    const dispatch = useAppDispatch();
     const [scrollDirection, setScrollDirection] = useState<string | null>(null);
     const lastScrollY = useRef(0);
-    const dispatch = useAppDispatch();
     const [isVisible, setIsVisible] = useState(false);
-    const isAnimatedHeaderVisible = useAppSelector((state) => state.header.isAnimatedHeaderVisible); // Visibility of the animated header
-    const notesSelected = useAppSelector((state) => state.notes.notesSelected);
     const [animatingOut, setAnimatingOut] = useState(false); // Track animation of the header
+    const notesSelected = useAppSelector((state) => state.notes.notesSelected);
     const isFirstRender = useRef(true);
+    const isAnimatedHeaderVisible = useAppSelector((state) => state.header.isAnimatedHeaderVisible); // Visibility of the animated header
     const isMobileScreen = useMediaQuery({ query: '(max-width: 611px)' });
-    const breakPointForSearchContainer = useMediaQuery({ query: '(max-width: 1059.9px)' });
-    const breakPointForDrawer = useMediaQuery({ query: '(max-width: 1500px)' });
+    const breakPointToHideSearchContainer = useMediaQuery({ query: '(max-width: 1059.9px)' });
+    const breakPointToRenderMobileDrawer = useMediaQuery({ query: '(max-width: 1500px)' });
 
     // Toggle the drawers
     const toggleDrawer = () => {
-        if (breakPointForDrawer){
-            dispatch(toggleMobileDrawer({ value: true }));
+        if (breakPointToRenderMobileDrawer){
+            dispatch(toggleMobileDrawer(true));
         } else {
             dispatch(toggleCollapsedDrawer());
         }
@@ -55,15 +55,20 @@ export default function Header() {
         setAnimatingOut(true);
         setTimeout(() => { 
             dispatch(updateIsAnimatedHeaderVisible(false));
-            setIsVisible(true);
+            setIsVisible(false);
         }, 400); // Wait for animation to finish before removing the element (400ms = animation duration)
     };
-    
+
     useEffect(() => {
         // If there are any selected notes, make the animated header visible
         if (notesSelected.length > 0){
             dispatch(updateIsAnimatedHeaderVisible(true));
         } else {
+            /* 
+                If not, hide the animated header and reset 
+                the state of the background options toolbar
+            */ 
+            dispatch(resetBackgroundOptionsToolbar());
             dispatch(updateIsAnimatedHeaderVisible(false));
         }
     }, [notesSelected]);
@@ -143,7 +148,7 @@ export default function Header() {
 
                     {   
                         // Don't render the search container until the width of the screen is beyond 1059px 
-                        breakPointForSearchContainer === false ? 
+                        breakPointToHideSearchContainer === false ? 
                             <div className={header_styles.search_note_container}>
                                 <button className={header_styles.search_button}>
                                     <SearchSVG className={header_styles.search_icon} />
@@ -177,7 +182,7 @@ export default function Header() {
                                     </AppTooltip>
 
                                     <AppTooltip className={header_styles.settings_btn_tooltip} title="Settings" >
-                                        <button onClick={() => toggleAppTheme(dispatch)} className={header_styles.header_action_button}>
+                                        <button className={header_styles.header_action_button}>
                                             <SettingsSVG className={header_styles.settings_icon} />
                                         </button>
                                     </AppTooltip>

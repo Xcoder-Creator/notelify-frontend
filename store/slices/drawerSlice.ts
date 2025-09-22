@@ -1,13 +1,8 @@
 import { DrawerReduxStateProps } from '@/types/drawer-redux-state.types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface ToggleMobileDrawerProps {
-    /** The opened or closed state of the mobile drawer */
-    value: boolean;
-}
-
 /*
-    This redux slice is for managing the state of the drawer
+    This redux slice manages the state of the drawer
 */
 const initialState: DrawerReduxStateProps = {
     isCollapsed: false,
@@ -19,15 +14,15 @@ const drawerSlice = createSlice({
     initialState,
     reducers: {
         /* Toggle the collapsed state of the drawer */
-        toggleCollapsedDrawer(state, action: PayloadAction<void>) {
+        toggleCollapsedDrawer(state) {
             state.isCollapsed = !state.isCollapsed;
         },
 
         /* Toggle the open or close state of the drawer */
-        toggleMobileDrawer(state, action: PayloadAction<ToggleMobileDrawerProps>) {
-            state.mobileDrawer = action.payload.value;
+        toggleMobileDrawer(state, action: PayloadAction<boolean>) {
+            state.mobileDrawer = action.payload;
         }
-    },
+    }
 });
 
 export const { toggleCollapsedDrawer, toggleMobileDrawer } = drawerSlice.actions;

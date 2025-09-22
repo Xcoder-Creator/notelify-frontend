@@ -1,4 +1,6 @@
-/** Interface for the users data. */
+/** 
+ * Interface for the users data. 
+ */
 export interface UserData {
     /** The users ID */
     userID: string; 
@@ -19,7 +21,9 @@ export interface UserData {
     accessToken: string;
 }
 
-/** Interface for the auth API redux state. */
+/** 
+ * Interface for the auth API redux state. 
+ */
 export interface UserAuthReduxStateProps {
     /** The users data */
     userData: UserData | null;

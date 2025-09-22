@@ -1,4 +1,4 @@
-import { AppDispatch } from "@/store";
+import { AppDispatch, store } from "@/store";
 import { updateErrMsgAndError } from "@/store/slices/userAuthSlice";
 import axios from "axios";
 import { ParamValue } from "next/dist/server/request/params";
@@ -13,7 +13,6 @@ interface ResetPasswordDetails {
 
 /**
  * This method will be used to reset the users password.
- * @param dispatch - The redux dispatch function
  * @param token - The verification token
  * @param resetPasswordDetails - The users details needed to reset their password
  * @param setError - The setter method for the error state
@@ -23,7 +22,7 @@ interface ResetPasswordDetails {
  * @param controllerRef - The abort controller reference
  * @return void
  */
-const resetPassword = async (dispatch: AppDispatch, token: ParamValue, resetPasswordDetails: ResetPasswordDetails, setError: React.Dispatch<React.SetStateAction<boolean>>, setErrorTitle: React.Dispatch<React.SetStateAction<string | null>>, setErrMsg: React.Dispatch<React.SetStateAction<string | null>>, setSuccess: React.Dispatch<React.SetStateAction<boolean>>, controllerRef: React.RefObject<AbortController | null>) => {
+const resetPassword = async (token: ParamValue, resetPasswordDetails: ResetPasswordDetails, setError: React.Dispatch<React.SetStateAction<boolean>>, setErrorTitle: React.Dispatch<React.SetStateAction<string | null>>, setErrMsg: React.Dispatch<React.SetStateAction<string | null>>, setSuccess: React.Dispatch<React.SetStateAction<boolean>>, controllerRef: React.RefObject<AbortController | null>) => {
     // Cancel any pending requests and reset the abort controller
     controllerRef.current?.abort();
     controllerRef.current = new AbortController();
@@ -32,7 +31,7 @@ const resetPassword = async (dispatch: AppDispatch, token: ParamValue, resetPass
     setSuccess(false);
     setErrorTitle(null);
     setErrMsg(null);
-    dispatch(updateErrMsgAndError({ errMsg: null, error: false }));
+    store.dispatch(updateErrMsgAndError({ errMsg: null, error: false }));
 
     try {
         await axios.post(`/api/auth/reset-password/${token}`, resetPasswordDetails,
@@ -62,12 +61,12 @@ const resetPassword = async (dispatch: AppDispatch, token: ParamValue, resetPass
         */
         if (axios.isAxiosError(error) && error.response) {
             if (error.response.data.message){
-                dispatch(updateErrMsgAndError({ errMsg: error.response.data.message, error: true }));
+                store.dispatch(updateErrMsgAndError({ errMsg: error.response.data.message, error: true }));
             } else {
-                dispatch(updateErrMsgAndError({ errMsg: "An error occurred while resetting your password", error: true }));
+                store.dispatch(updateErrMsgAndError({ errMsg: "An error occurred while resetting your password", error: true }));
             }
         } else {
-            dispatch(updateErrMsgAndError({ errMsg: "An error occurred while resetting your password", error: true }));
+            store.dispatch(updateErrMsgAndError({ errMsg: "An error occurred while resetting your password", error: true }));
         }
     }
 }

@@ -5,10 +5,10 @@ import auth_styles from '@/components/auth/Auth.module.css';
 import Image from "next/image";
 import reset_password_styles from '@/components/auth/ResetPassword.module.css';
 import EyeSVG from "@/components/svg-comp/Eye";
-import forceLightTheme from "@/lib/forceLightTheme";
+import forceLightTheme from "@/lib/theme/forceLightTheme";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import ScreenLoader from "@/components/ScreenLoader";
-import { updateErrMsgAndError, updateLoadingScreen } from "@/store/slices/userAuthSlice";
+import { updateErrMsgAndError, updateLoadingScreen, updateSuccessMsgAndSuccess, updateWarningMsgAndWarning } from "@/store/slices/userAuthSlice";
 import { useParams } from "next/navigation";
 import checkResetPasswordToken from "@/api/auth/checkResetPasswordToken";
 import CloseCircleSVG from "@/components/svg-comp/CloseCircle";
@@ -52,19 +52,19 @@ export default function ResetPassword() {
     });
 
     // This method is called when the form validation is successfull
-    const onSubmit = async (data: FormData) => await resetPassword(dispatch, params.token, { newPassword: data.newPassword }, setError, setErrorTitle, setErrMsg, setSuccess, controllerRef);
+    const onSubmit = async (data: FormData) => await resetPassword(params.token, { newPassword: data.newPassword }, setError, setErrorTitle, setErrMsg, setSuccess, controllerRef);
 
     // Button is disabled if any errors exist
     const hasErrors = Object.keys(errors).length > 0;
     
     useEffect(() => {
-        forceLightTheme(dispatch);
+        forceLightTheme();
         dispatch(updateLoadingScreen({ loadingScreen: true }));
 
         const token = params.token; // Get the token from route param
 
         const run = async () => {
-            await checkResetPasswordToken(dispatch, token, setError, setErrorTitle, setErrMsg, setSuccess, controllerRef);
+            await checkResetPasswordToken(token, setError, setErrorTitle, setErrMsg, setSuccess, controllerRef);
         }
 
         run();
@@ -74,6 +74,9 @@ export default function ResetPassword() {
             controllerRef.current?.abort();
             controllerRef.current = null;
             dispatch(updateLoadingScreen({ loadingScreen: true }));
+            dispatch(updateErrMsgAndError({ errMsg: null, error: false }));
+            dispatch(updateSuccessMsgAndSuccess({ successMsg: null, success: false }));
+            dispatch(updateWarningMsgAndWarning({ warningMsg: null, warning: false }));
         }
     }, []);
 

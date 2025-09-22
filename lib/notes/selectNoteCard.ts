@@ -1,43 +1,38 @@
 import { Dispatch, SetStateAction } from "react";
-import { AppDispatch } from "@/store";
+import { store } from "@/store";
 import { updateSelectedNotes } from "@/store/slices/notesSlice";
 import { NoteProps } from "@/types/notes/notes-redux-state.types";
-import { updateActiveBgTheme, updateActiveWallpaper } from "@/store/slices/backgroundToolbarBottomSheetSlice";
+import { updateActiveBgTheme, updateActiveWallpaper } from "@/store/slices/note_editor/backgroundOptionsToolbarSlice";
 
 /**
- * This method is called when the user selects a note card
- * @param dispatch - The dispatch method for redux
+ * This method is called when the user selects or deselects a note card.
  * @param note - The data content of the note
  * @param noteSelected - Wether the note was selected or not
  * @param setNoteSelected - The state setter for the note selected state property
- * @param index - The index position of the note
  * @return void
  */
 const selectNoteCard = (
-    dispatch: AppDispatch,
     note: NoteProps,
     noteSelected: boolean,
-    setNoteSelected: Dispatch<SetStateAction<boolean>>,
-    index: number
+    setNoteSelected: Dispatch<SetStateAction<boolean>>
 ) => {
+    // If the note is already selected, deselect the note immediately
     if (noteSelected){ // Deselect a note
         setNoteSelected(false);
-        dispatch(updateSelectedNotes({ 
+        store.dispatch(updateSelectedNotes({ 
             action: 'deselect',
-            noteID: note.id,
-            index: index
+            noteID: note.noteID
         }));
     } else { // Select a note
         setNoteSelected(true);
-        dispatch(updateSelectedNotes({ 
+        store.dispatch(updateSelectedNotes({ 
             action: 'select',
-            noteID: note.id,
-            index: index
+            noteID: note.noteID
         }));
 
-        // Update the background toolbar with the current selected note theme and wallpaper
-        dispatch(updateActiveBgTheme(note.bgThemeID));
-        dispatch(updateActiveWallpaper(note.wallpaperID));
+        // Update the background options toolbar with the current selected note theme and wallpaper
+        store.dispatch(updateActiveBgTheme({ themeID: note.bgColor }));
+        store.dispatch(updateActiveWallpaper({ wallpaperID: note.wallpaper }));
     }
 }
 
