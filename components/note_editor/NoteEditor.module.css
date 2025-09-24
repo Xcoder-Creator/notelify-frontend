@@ -51,6 +51,18 @@
     font-size: 16px;
 }
 
+.toolbar_and_timestamp {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 16px;
+}
+
+.timestamp {
+    color: #ffffffcc;
+    font-size: .88rem;
+}
+
 .input_action_button {
     transition: 0.2s ease-in-out;
     cursor: pointer;
@@ -233,15 +245,6 @@
     margin-right: 8px;
     margin-top: 8px;
     margin-bottom: 8px;
-    -webkit-transition-duration: .218s;
-    transition-duration: .218s;
-    -webkit-transition-property: background, border, opacity, -webkit-box-shadow, -webkit-transform;
-    -webkit-transition-property: background, border, opacity, box-shadow, -webkit-transform;
-    transition-property: background, border, opacity, box-shadow, -webkit-transform;
-    transition-property: background, border, opacity, box-shadow, transform;
-    transition-property: background, border, opacity, box-shadow, transform, -webkit-transform;
-    -webkit-transition-timing-function: ease-in;
-    transition-timing-function: ease-in;
 }
 
 .active {
@@ -282,6 +285,8 @@
     max-height: unset;
     height: 100%;
     border-radius: 0px;
+    display: flex;
+    flex-direction: column;
 }
 
 .selected_image_container {

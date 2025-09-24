@@ -1,0 +1,49 @@
+.container {
+    background-color: var(--background);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+    padding: 12px 0px 16px 0px;
+    max-height: 80%;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    z-index: 1000;
+    transform: translateY(210px);
+    transition: transform 0.3s ease-out;
+    will-change: transform;
+    background-position: 100% 100% !important;
+    background-size: cover !important;
+}
+
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(32, 33, 36, 0.75);
+    opacity: 1;
+    transition: opacity .25s ease-out;
+    z-index: 999; /* behind the sheet */  
+}
+
+.theme_section {
+    gap: 5px;
+}
+
+.wallpaper_section {
+    gap: 5px;
+    border: none;
+    max-width: unset;
+    width: auto;
+    justify-content: unset;
+    padding: 8px 9px 3px 9px;
+}
+
+.color_label {
+    margin-bottom: 4px;
+    padding: 0 9px;
+    color: var(--foreground-text);
+}
+
+.separator {
+    margin: 14px;
+}

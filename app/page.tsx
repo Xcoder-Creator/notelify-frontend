@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useRouter } from "next/navigation";
 import userAuth from "@/api/auth/userAuth";
@@ -13,16 +13,19 @@ import { useMediaQuery } from "react-responsive";
 import MobileDrawer from "@/components/drawer/MobileDrawer";
 import note_editor_styles from '@/components/note_editor/NoteEditor.module.css';
 import NoteEditorMain from "@/components/note_editor/Main";
-import { updateEditorContent } from "@/store/slices/note_editor/editorSlice";
-import { useEditor } from "@tiptap/react";
-import StarterKit from '@tiptap/starter-kit';
-import { Placeholder } from '@tiptap/extensions';
-import { updateFormattingOptions } from "@/store/slices/note_editor/formattingOptionsToolbarSlice";
-import { updateRedoButton, updateUndoButton } from "@/store/slices/note_editor/actionToolbarSlice";
+import { updateEditorContent, updateEditorTitle } from "@/store/slices/note_editor/editorSlice";
+import { Editor } from "@tiptap/react";
 import SnackbarComp from "@/components/SnackbarComp";
 import NotesLayout from "@/components/notes/NotesLayout";
 import note_styles from '@/components/notes/NotesLayout.module.css';
 import NoteEditorPlaceholder from "@/components/note_editor/NoteEditorPlaceholder";
+import { updateIsAnimatedHeaderVisible } from "@/store/slices/headerSlice";
+import { clearSelectedNotes, updateCurrentNoteTheme } from "@/store/slices/notesSlice";
+import NoteEditorDialog from "@/components/dialog/NoteEditorDialog";
+import BackgroundOptionsToolbarBottomSheet from "@/components/BackgroundOptionsToolbarBottomSheet";
+import createNewEditorInstance from "@/lib/note_editor/createNewEditorInstance";
+import resetNoteEditorState from "@/lib/note_editor/resetNoteEditorState";
+import FabComp from "@/components/notes/FabComp";
 
 /**
  * This is the home page.
@@ -33,10 +36,40 @@ export default function Home() {
     const loadingScreen = useAppSelector((state) => state.userAuth.loadingScreen);
     const router = useRouter();
     const controllerRef = useRef<AbortController | null>(null);
-    const editorContent = useAppSelector((state) => state.editor.content);
     const isFocused = useAppSelector((state) => state.editor.isFocused); // A redux state to track if the editor is focused or not
     const breakPointToRenderMobileDrawer = useMediaQuery({ query: '(max-width: 1500px)' }); // This breakpoint defines when the mobile drawer can become visible/rendered
     const noteEditorPlaceholderRef = useRef<HTMLDivElement>(null); // The note editor placeholder ref
+    const backgroundOptionsButtonRef = useRef<HTMLButtonElement>(null); // The ref of the background options button in the action toolbar
+    const backgroundOptionsToolbarRef = useRef<HTMLDivElement>(null); // The ref of the background options toolbar
+    const noteEditorAndTitleInputRef = useRef<HTMLDivElement>(null); // The ref of the note editor and title input
+    const dropdownMenuRef = useRef<HTMLDivElement>(null); // The ref of the dropdown menu
+    const moreOptionsButtonRef = useRef<HTMLButtonElement>(null); // The ref of the more button
+    const fileInputRef = useRef<HTMLInputElement | null>(null); //  The ref for the file input
+    const [selectedImages, setSelectedImages] = useState<File[]>([]); // The state for holding all selected images
+    const noteEditorDialogState = useAppSelector((state) => state.notes.noteEditorDialog); // The state of the note editor dialog
+    const breakPointForBottomSheet = useMediaQuery({ query: '(max-width: 490px)' }); // This breakpoint defines when the dialog bottom sheet can become visible/rendered
+    const backgroundOptionsToolbarBottomSheet = useAppSelector((state) => state.bottomSheet.state); // The state of the bottomsheet
+    const noteEditorDialog = useAppSelector((state) => state.notes.noteEditorDialog); // The state of the note editor dialog
+    const editorRef = useRef<Editor | null>(null); // The note editor reference
+    const [editor, setEditor] = useState<Editor | null>(null); // The note ediitor reference
+    const breakPointForFab = useMediaQuery({ query: '(max-width: 820px)' }); // This is the break point to render the FAB component
+
+    useEffect(() => {
+        /* 
+            If the editor is visible, hide the animated 
+            header and clear all selected notes
+        */
+        if (isFocused){
+            let newInstance = createNewEditorInstance('');
+            editorRef.current = newInstance;
+            setEditor(newInstance);
+            dispatch(updateIsAnimatedHeaderVisible(false));
+            dispatch(clearSelectedNotes());
+        } else {
+            // Reset the state of the entire note editor to its default
+            resetNoteEditorState(editorRef, setEditor, setSelectedImages, noteEditorAndTitleInputRef, noteEditorPlaceholderRef);
+        }
+    }, [isFocused]);
 
     useEffect(() => {
         handleTheme(); // Handle app theme
@@ -61,38 +94,17 @@ export default function Home() {
         }
     }, []);
 
-    // The editor instance
-    const editor = useEditor({
-        extensions: [
-            StarterKit,
-            Placeholder.configure({ placeholder: 'Take a note...' })
-        ],
-        content: editorContent,
-        immediatelyRender: false,
-        onSelectionUpdate: ({ editor }) => {
-            dispatch(updateFormattingOptions({
-                headerOne: editor.isActive('heading', { level: 1 }),
-                headerTwo: editor.isActive('heading', { level: 2 }),
-                normalText: editor.isActive('paragraph'),
-                bold: editor.isActive('bold'),
-                italic: editor.isActive('italic'),
-                underline: editor.isActive('underline'),
-            }));
-        },
-        onTransaction: ({ editor }) => {
-            dispatch(updateUndoButton(editor.can().undo()));
-            dispatch(updateRedoButton(editor.can().redo()));
-        },
-        onCreate: ({ editor }) => {
-            if (isFocused) {
-                editor.commands.focus('end');
-            }
-        },
-        onUpdate: ({ editor }) => {
-            const html = editor.getHTML();
-            dispatch(updateEditorContent(html));
+    // When the editor closes, reset the state of the dialog
+    useEffect(() => {
+        if (!noteEditorDialog){
+            editorRef.current?.destroy();
+            editorRef.current = null;
+            setEditor(null);
+            dispatch(updateEditorTitle(""));
+            dispatch(updateEditorContent(""));
+            setSelectedImages([]);
         }
-    });
+    }, [noteEditorDialog]);
 
     //if (loadingScreen) return <ScreenLoader />;
 
@@ -112,6 +124,14 @@ export default function Home() {
                                 <NoteEditorMain 
                                     editor={editor} 
                                     noteEditorPlaceholderRef={noteEditorPlaceholderRef}
+                                    backgroundOptionsButtonRef={backgroundOptionsButtonRef}
+                                    backgroundOptionsToolbarRef={backgroundOptionsToolbarRef}
+                                    dropdownMenuRef={dropdownMenuRef}
+                                    moreOptionsButtonRef={moreOptionsButtonRef}
+                                    fileInputRef={fileInputRef}
+                                    selectedImages={selectedImages} 
+                                    setSelectedImages={setSelectedImages}
+                                    noteEditorAndTitleInputRef={noteEditorAndTitleInputRef}
                                 />
                             :   <NoteEditorPlaceholder
                                     editor={editor}
@@ -125,6 +145,39 @@ export default function Home() {
                     </div>
                 </div>
             </div>
+
+            {
+                noteEditorDialogState ?
+                    <NoteEditorDialog
+                        editor={editor} 
+                        noteEditorPlaceholderRef={noteEditorPlaceholderRef}
+                        backgroundOptionsButtonRef={backgroundOptionsButtonRef}
+                        backgroundOptionsToolbarRef={backgroundOptionsToolbarRef}
+                        dropdownMenuRef={dropdownMenuRef}
+                        moreOptionsButtonRef={moreOptionsButtonRef}
+                        fileInputRef={fileInputRef}
+                        selectedImages={selectedImages} 
+                        setSelectedImages={setSelectedImages}
+                        setEditor={setEditor}
+                        editorRef={editorRef}
+                    />
+                :   null
+            }
+
+            {
+                breakPointForBottomSheet ?
+                    <>
+                        {
+                            backgroundOptionsToolbarBottomSheet ?
+                                <BackgroundOptionsToolbarBottomSheet />
+                            :   null
+                        }
+                    </>
+                :   null
+            }
+
+            {/* ----Render the fab component---- */}
+            {breakPointForFab && <FabComp />}
 
             <SnackbarComp 
                 autoHideDuration={3000} 

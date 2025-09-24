@@ -9,6 +9,7 @@ import formattingOptionsToolbarReducer from './slices/note_editor/formattingOpti
 import backgroundOptionsToolbarReducer from './slices/note_editor/backgroundOptionsToolbarSlice';
 import notesReducer from './slices/notesSlice';
 import headerReducer from './slices/headerSlice';
+import bottomSheetReducer from './slices/bottomSheetSlice';
 
 // The configured redux data store
 export const store = configureStore({
@@ -22,7 +23,8 @@ export const store = configureStore({
         formattingOptionsToolbar: formattingOptionsToolbarReducer,
         backgroundOptionsToolbar: backgroundOptionsToolbarReducer,
         notes: notesReducer,
-        header: headerReducer
+        header: headerReducer,
+        bottomSheet: bottomSheetReducer
     }
 });
 

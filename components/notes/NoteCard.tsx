@@ -14,13 +14,14 @@ import backgroundThemes from '@/utils/note_editor/background_options_toolbar/bac
 import DropdownMenu from './DropdownMenu';
 import handleClickOutsideForDropdownMenu from '@/lib/notes/handleClickOutsideForDropdownMenu';
 import selectNoteCard from '@/lib/notes/selectNoteCard';
+import viewNoteInNoteEditorDialog from '@/lib/notes/viewNoteInNoteEditorDialog';
 
 /** This is the card component for each note in the notes masonry layout */
 export default function NoteCard({ note, index }: NotesCardProps){
-    const [dropdownMenu, setDropdownMenu] = useState(false);
-    const dropdownMenuRef = useRef<HTMLDivElement>(null);
-    const moreOptionsButtonRef = useRef<HTMLButtonElement>(null);
-    const [noteSelected, setNoteSelected] = useState(false);
+    const [dropdownMenu, setDropdownMenu] = useState(false); // The state of the dropdown menu
+    const dropdownMenuRef = useRef<HTMLDivElement>(null); // The ref of the dropdown menu
+    const moreOptionsButtonRef = useRef<HTMLButtonElement>(null); // The ref of the more options button
+    const [noteSelected, setNoteSelected] = useState(false); // The state of the note card wether selected or not
     const currentDeselectedNoteID = useAppSelector((state) => state.notes.currentDeselectedNoteID);
     const selectedNotes = useAppSelector((state) => state.notes.notesSelected);
     const theme = useAppSelector((state) => state.theme.theme); // The app theme
@@ -87,6 +88,7 @@ export default function NoteCard({ note, index }: NotesCardProps){
         >
             <div 
                 className={note_styles.note_card_top}
+                onClick={() => viewNoteInNoteEditorDialog(note)}
             >
                 <div className={note_styles.note_card_top_title_div}>
                     <p className={note_styles.note_title}>{note.title}</p>

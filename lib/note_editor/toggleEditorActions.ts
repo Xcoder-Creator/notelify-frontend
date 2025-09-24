@@ -1,7 +1,7 @@
 import { RefObject } from "react";
 import { Editor } from '@tiptap/react';
 import { store } from "@/store";
-import { toggleDropdownMenu, updateFormattingOptionsButton } from "@/store/slices/note_editor/actionToolbarSlice";
+import { toggleDialogDropdownMenu, toggleDropdownMenu, updateFormattingOptionsButton } from "@/store/slices/note_editor/actionToolbarSlice";
 import { updateFormattingOptionsToolbarState } from "@/store/slices/note_editor/formattingOptionsToolbarSlice";
 import { toggleBackgroundOptionsToolbarState } from "@/store/slices/note_editor/backgroundOptionsToolbarSlice";
 
@@ -35,7 +35,15 @@ const toggleEditorActions = (action: number, fileInputRef: RefObject<HTMLInputEl
         // This is for archiving a note
     } else if (action === 5){ // For toggling the dropdown menu
         let dropdownmenu = store.getState().actionToolbar.dropdownMenu;
-        store.dispatch(toggleDropdownMenu(!dropdownmenu));
+        let dialogDropdownMenu = store.getState().actionToolbar.dialogDropdownMenu;
+
+        // Check if the note editor dialog is opened
+        if (store.getState().notes.noteEditorDialog){
+            // Toggle the dialog dropdown menu instead
+            store.dispatch(toggleDialogDropdownMenu(!dialogDropdownMenu));
+        } else {
+            store.dispatch(toggleDropdownMenu(!dropdownmenu));
+        }
     } else if (action === 6){ // For undo action
         if (store.getState().actionToolbar.undo){
             editor?.chain().focus().undo().run();

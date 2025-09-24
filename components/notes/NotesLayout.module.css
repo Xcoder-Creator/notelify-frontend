@@ -115,15 +115,6 @@
     background-position-y: bottom;
     background-size: cover;
     border-radius: 8px;
-    -webkit-transition-duration: .218s;
-    transition-duration: .218s;
-    -webkit-transition-property: background, border, opacity, -webkit-box-shadow, -webkit-transform;
-    -webkit-transition-property: background, border, opacity, box-shadow, -webkit-transform;
-    transition-property: background, border, opacity, box-shadow, -webkit-transform;
-    transition-property: background, border, opacity, box-shadow, transform;
-    transition-property: background, border, opacity, box-shadow, transform, -webkit-transform;
-    -webkit-transition-timing-function: ease-in;
-    transition-timing-function: ease-in;
 }  
 
 .note_selected {

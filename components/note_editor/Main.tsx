@@ -1,36 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
-import NoteEditorPlaceholder from './NoteEditorPlaceholder';
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { Editor } from '@tiptap/react';
 import NoteEditor from './NoteEditor';
 import closeEditor from '@/lib/note_editor/closeEditor';
 import { resetBackgroundOptionsToolbar } from '@/store/slices/note_editor/backgroundOptionsToolbarSlice';
 import { toggleDropdownMenu } from '@/store/slices/note_editor/actionToolbarSlice';
-
-/** Interface for the main note editor component */
-interface NoteEditorMainProps {
-    /** The editor instance */
-    editor: Editor | null;
-
-    /** The note editor placeholder ref */
-    noteEditorPlaceholderRef: React.RefObject<HTMLDivElement | null>;
-}
+import NoteEditorMainProps from '@/types/note_editor/note-editor-main.types';
 
 /**
  * This is the main component for the note editor.
  * It manages the state and behavior of the editor and its placeholder.
  */
-export default function NoteEditorMain({ editor, noteEditorPlaceholderRef }: NoteEditorMainProps) {
+export default function NoteEditorMain({ editor, noteEditorPlaceholderRef, backgroundOptionsButtonRef, backgroundOptionsToolbarRef, dropdownMenuRef, moreOptionsButtonRef, fileInputRef, selectedImages, setSelectedImages, noteEditorAndTitleInputRef }: NoteEditorMainProps) {
     const dispatch = useAppDispatch(); // The dispatch redux method
     const isFocused = useAppSelector((state) => state.editor.isFocused); // A redux state to track if the editor is focused or not
-    const backgroundOptionsButtonRef = useRef<HTMLButtonElement>(null); // The ref of the background options button in the action toolbar
-    const backgroundOptionsToolbarRef = useRef<HTMLDivElement>(null); // The ref of the background options toolbar
-    const dropdownMenuRef = useRef<HTMLDivElement>(null); // The ref of the dropdown menu
-    const moreOptionsButtonRef = useRef<HTMLButtonElement>(null); // The ref of the more button
-    const fileInputRef = useRef<HTMLInputElement | null>(null); //  The ref for the file input
-    const [selectedImages, setSelectedImages] = useState<File[]>([]); // The state for holding all selected images
 
     /* 
         This useEffect handles situations where by the user clicks 
@@ -46,8 +30,8 @@ export default function NoteEditorMain({ editor, noteEditorPlaceholderRef }: Not
             // Close the note editor
             if (noteEditorPlaceholderRef.current &&
                 !noteEditorPlaceholderRef.current.contains(target)) {
-                if (!editor.isDestroyed) {
-                    closeEditor(editor);
+                if (!editor?.isDestroyed) {
+                    closeEditor(editor, null, null);
                 }
             }
 
@@ -71,7 +55,7 @@ export default function NoteEditorMain({ editor, noteEditorPlaceholderRef }: Not
         // Close the note editor once the user taps the escape button on the keyboard
         const handleEsc = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
-                closeEditor(editor);
+                closeEditor(editor, null, null);
             }
         };
 
@@ -98,6 +82,9 @@ export default function NoteEditorMain({ editor, noteEditorPlaceholderRef }: Not
             fileInputRef={fileInputRef}
             selectedImages={selectedImages} 
             setSelectedImages={setSelectedImages}
+            dialogComp={null}
+            setDialogComp={null}
+            noteEditorAndTitleInputRef={noteEditorAndTitleInputRef}
         />
     );
 }

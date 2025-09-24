@@ -1,4 +1,5 @@
 import { NotesReduxStateProps, NoteProps, UpdateSelectedNotesProps } from '@/types/notes/notes-redux-state.types';
+import formatNoteDate from '@/utils/notes/formatNoteDate.util';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 /* 
@@ -25,9 +26,9 @@ const initialState: NotesReduxStateProps = {
             
             wallpaper: 0,
 
-            createdAt: "5th Sep, 2025",
+            createdAt: "2023-09-23T19:07:32.123Z",
 
-            updatedAt: "7th Sep, 2025",
+            updatedAt: "2023-09-23T19:07:32.123Z",
 
             attachments: []
         }
@@ -43,7 +44,17 @@ const initialState: NotesReduxStateProps = {
 
     currentDeselectedNoteID: null,
 
-    bottomSheet: false
+    bottomSheet: false,
+
+    noteEditorDialog: false,
+
+    currentNoteTheme: 0,
+
+    currentNoteWallpaper: 0,
+
+    currentNoteTimestamp: formatNoteDate(new Date()),
+
+    currentViewedNote: null
 };
 
 const notesSlice = createSlice({
@@ -68,6 +79,44 @@ const notesSlice = createSlice({
         /* Update the others page */
         updateOthersPage(state, action: PayloadAction<{ value: number }>) {
             state.othersPage = action.payload.value;
+        },
+
+        /* Update the theme of all the selected notes */
+        updateNoteTheme(state, action: PayloadAction<{
+            /** The ID of the theme/bg color that the user selected */
+            bgColor: number;
+        }>){
+            // Loop through the selected notes and update them with the selected theme by the user
+            for (const [i, selectedNote] of state.notesSelected.entries()) {
+                let getNoteIndex = state.pinnedNotes.findIndex(note => note.noteID === selectedNote.noteID); // Get the index of the note
+                if (getNoteIndex !== -1){
+                    state.pinnedNotes[getNoteIndex].bgColor = action.payload.bgColor;
+                } else {
+                    getNoteIndex = state.othersNotes.findIndex(note => note.noteID === selectedNote.noteID); // Get the index of the note
+                    if (getNoteIndex !== -1){
+                        state.othersNotes[getNoteIndex].bgColor = action.payload.bgColor;
+                    }
+                }
+            }
+        },
+
+        /* Update the theme of all the selected notes */
+        updateNoteWallpaper(state, action: PayloadAction<{
+            /** The ID of the wallpaper that the user selected */
+            wallpaper: number;
+        }>){
+            // Loop through the selected notes and update them with the selected wallpaper by the user
+            for (const [i, selectedNote] of state.notesSelected.entries()) {
+                let getNoteIndex = state.pinnedNotes.findIndex(note => note.noteID === selectedNote.noteID); // Get the index of the note
+                if (getNoteIndex !== -1){
+                    state.pinnedNotes[getNoteIndex].wallpaper = action.payload.wallpaper;
+                } else {
+                    getNoteIndex = state.othersNotes.findIndex(note => note.noteID === selectedNote.noteID); // Get the index of the note
+                    if (getNoteIndex !== -1){
+                        state.othersNotes[getNoteIndex].wallpaper = action.payload.wallpaper;
+                    }
+                }
+            }
         },
 
         /* 
@@ -102,9 +151,78 @@ const notesSlice = createSlice({
         /* Toggle the visibility of the bottom sheet */
         toggleBottomSheet(state, action: PayloadAction<boolean>){
             state.bottomSheet = action.payload;
+        },
+
+        /* Toggle the note editor dialog */
+        toggleNoteEditorDialog(state, action: PayloadAction<boolean>){
+            state.noteEditorDialog = action.payload;
+        },
+
+        /* Update the current note theme */
+        updateCurrentNoteTheme(state, action: PayloadAction<{
+            /** The ID of the theme */
+            themeID: number;
+        }>){
+            state.currentNoteTheme = action.payload.themeID;
+        },
+
+        /* Update the current note wallpaper */
+        updateCurrentNoteWallpaper(state, action: PayloadAction<{
+            /** The ID of the wallpaper */
+            wallpaperID: number;
+        }>){
+            state.currentNoteWallpaper = action.payload.wallpaperID;
+        },
+
+        /* Update the timestamp of the current viewed note in the note editor dialog */
+        updateCurrentNoteTimestamp(state, action: PayloadAction<{
+            /** The formated timestamp */
+            timestamp: string;
+        }>){
+            state.currentNoteTimestamp = action.payload.timestamp;
+        },
+
+        /* Update the current viewed note state */
+        updateCurrentViewedNote(state, action: PayloadAction<{
+            /** The currently viewed note */
+            note: NoteProps | null
+        }>){
+            state.currentViewedNote = action.payload.note;
+        },
+
+        /* Update the theme and wallpaper of the currently viewed note in the note editor dialog */
+        updateThemeOrWallpaperOfCurrentViewedNote(state, action: PayloadAction<{
+            /** The type of update to be done (Theme or Wallpaper) */
+            type: "theme" | "wallpaper",
+
+            /** The ID of the theme */
+            themeID: number,
+
+            /** The ID of the wallpaper */
+            wallpaperID: number 
+        }>){
+            const currentViewedNote = state.currentViewedNote;
+
+            // Check if the current viewed note is available
+            if (currentViewedNote){
+                const noteState = currentViewedNote.pinned ? "pinned" : "unpinned";
+
+                // Check if the note exists in the pinned or others notes array
+                let note = noteState === "pinned" ? 
+                    state.pinnedNotes.find(note => note.noteID === currentViewedNote.noteID)
+                :   state.othersNotes.find(note => note.noteID === currentViewedNote.noteID)
+
+                if (note){
+                    if (action.payload.type === "theme"){ // Update the theme
+                        note.bgColor = action.payload.themeID;
+                    } else { // Update the wallpaper
+                        note.wallpaper = action.payload.wallpaperID;
+                    }
+                }
+            }
         }
     },
 });
 
-export const { updatePinnedNotes, updateOthersNotes, updatePinnedPage, updateOthersPage, updateSelectedNotes, clearSelectedNotes, toggleBottomSheet } = notesSlice.actions;
+export const { updatePinnedNotes, updateOthersNotes, updatePinnedPage, updateOthersPage, updateNoteTheme, updateNoteWallpaper, updateSelectedNotes, clearSelectedNotes, toggleBottomSheet, toggleNoteEditorDialog, updateCurrentNoteTheme, updateCurrentNoteWallpaper, updateCurrentNoteTimestamp, updateCurrentViewedNote, updateThemeOrWallpaperOfCurrentViewedNote } = notesSlice.actions;
 export default notesSlice.reducer;

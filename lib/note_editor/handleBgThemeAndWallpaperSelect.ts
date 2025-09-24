@@ -1,6 +1,7 @@
 import { store } from "@/store";
 import { updateActiveBgTheme, updateActiveWallpaper } from "@/store/slices/note_editor/backgroundOptionsToolbarSlice";
 import { updateFormattingOptionsToolbarTheme } from "@/store/slices/note_editor/formattingOptionsToolbarSlice";
+import { updateCurrentNoteTheme } from "@/store/slices/notesSlice";
 import { RefObject } from "react";
 
 /**
@@ -16,6 +17,7 @@ const handleBgThemeAndWallpaperSelect = (type: string, id: number, value: string
     // Check if the user is selecting a theme or a wallpaper
     if (type === 'theme'){
         store.dispatch(updateActiveBgTheme({ themeID: id })); // Make the theme that the user selected to be the active theme
+        store.dispatch(updateCurrentNoteTheme({ themeID: id })); // Update the theme of the current note in the editor
         
         if (noteEditorPlaceholderRef.current){ // Check if the note editor and placeholder ref is available
             if (id === 0){

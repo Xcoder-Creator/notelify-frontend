@@ -8,7 +8,8 @@ const initialState: ActionToolbarReduxStateProps = {
     formattingOptionsButton: true,
     undo: false,
     redo: false,
-    dropdownMenu: false
+    dropdownMenu: false,
+    dialogDropdownMenu: false
 };
 
 const actionToolbarSlice = createSlice({
@@ -35,6 +36,11 @@ const actionToolbarSlice = createSlice({
             state.dropdownMenu = action.payload;
         },
 
+        /* Toggle the dialog dropdown menu */
+        toggleDialogDropdownMenu(state, action: PayloadAction<boolean>) {
+            state.dialogDropdownMenu = action.payload;
+        },
+
         /* Reset the state of the action toolbar to its default */
         resetActionToolbar(state) {
             state.formattingOptionsButton = true;
@@ -44,5 +50,5 @@ const actionToolbarSlice = createSlice({
     },
 });
 
-export const { updateFormattingOptionsButton, updateUndoButton, updateRedoButton, toggleDropdownMenu, resetActionToolbar } = actionToolbarSlice.actions;
+export const { updateFormattingOptionsButton, updateUndoButton, updateRedoButton, toggleDropdownMenu, toggleDialogDropdownMenu, resetActionToolbar } = actionToolbarSlice.actions;
 export default actionToolbarSlice.reducer;

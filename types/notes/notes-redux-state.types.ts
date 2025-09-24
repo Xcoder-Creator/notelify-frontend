@@ -79,4 +79,19 @@ export interface NotesReduxStateProps {
 
     /** The state of the bottomsheet */
     bottomSheet: boolean;
+
+    /** The note editor dialog */
+    noteEditorDialog: boolean;
+
+    /** The theme of the current note in view */
+    currentNoteTheme: number;
+
+    /** The wallpaper of the current note in view */
+    currentNoteWallpaper: number;
+
+    /** The formated timestamp of the current viewed note in the note editor dialog */
+    currentNoteTimestamp: string;
+
+    /** The currently viewed note in the note editor dialog */
+    currentViewedNote: NoteProps | null; 
 }

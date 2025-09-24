@@ -1,5 +1,5 @@
 import { store } from "@/store";
-import { toggleBottomSheet } from "@/store/slices/notesSlice";
+import { toggleBottomSheet } from "@/store/slices/bottomSheetSlice";
 import { toggleBackgroundOptionsToolbarState } from "@/store/slices/note_editor/backgroundOptionsToolbarSlice";
 
 /**
@@ -17,7 +17,7 @@ const toggleAnimatedHeaderActions = (action: number, breakPointForBottomSheet: b
             bottom sheet, then toggle the bottom sheet only
         */
         if (breakPointForBottomSheet){
-            if (store.getState().notes.bottomSheet){
+            if (store.getState().bottomSheet.state){
                 store.dispatch(toggleBottomSheet(false));
             } else {
                 store.dispatch(toggleBottomSheet(true));

@@ -1,4 +1,4 @@
-import { Dispatch, RefObject, SetStateAction } from "react";
+import React, { Dispatch, RefObject, SetStateAction } from "react";
 import { Editor } from '@tiptap/react';
 
 /**
@@ -31,6 +31,15 @@ interface NoteEditorProps {
     
     /** The setter method for updating the contents of the selected images array */
     setSelectedImages: Dispatch<SetStateAction<File[]>>;
+
+    /** The local dialog state */
+    dialogComp: boolean | null;
+    
+    /** The setter method for the local dialog state */
+    setDialogComp: Dispatch<SetStateAction<boolean>> | null;
+
+    /** The ref of the note editor and title input */
+    noteEditorAndTitleInputRef: RefObject<HTMLDivElement | null>;
 }
 
 export default NoteEditorProps;

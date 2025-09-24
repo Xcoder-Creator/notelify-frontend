@@ -1,5 +1,6 @@
 import { store } from "@/store";
 import { updateActiveBgTheme, updateActiveWallpaper } from "@/store/slices/note_editor/backgroundOptionsToolbarSlice";
+import { updateNoteTheme, updateNoteWallpaper } from "@/store/slices/notesSlice";
 
 /**
  * This method allows the user to pick any theme or wallpaper of their choice
@@ -13,8 +14,10 @@ const handleBgThemeAndWallpaperSelect = (type: string, id: number, value: string
     // Check if the user is selecting a theme or a wallpaper
     if (type === 'theme'){
         store.dispatch(updateActiveBgTheme({ themeID: id })); // Make the theme that the user selected to be the active theme
+        store.dispatch(updateNoteTheme({ bgColor: id })); // Update the theme of the selected notes
     } else if (type === 'wallpaper'){
         store.dispatch(updateActiveWallpaper({ wallpaperID: id })); // Make the wallpaper that the user selected to be the active wallpaper
+        store.dispatch(updateNoteWallpaper({ wallpaper: id })); // Update the wallpaper of the selected notes
     }
 }
 

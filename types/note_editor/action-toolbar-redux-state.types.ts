@@ -13,6 +13,9 @@ interface ActionToolbarReduxStateProps {
 
     /** The state of the dropdown menu */
     dropdownMenu: boolean;
+
+    /** The state of the dropdown menu in the note editor dialog */
+    dialogDropdownMenu: boolean;
 }
 
 export default ActionToolbarReduxStateProps;
