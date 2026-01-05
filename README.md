@@ -4,6 +4,24 @@ Notelify is a modern note-taking web application inspired by Google Keep Notes.
 
 This repository contains the **frontend** built with React, TypeScript and Next.js.
 
+## 🚀 Features
+
+- Create, edit and delete notes  
+- Upload and display media  
+- Fast and responsive UI  
+- Clean and scalable architecture  
+- Fully responsive design  
+
+---
+
+## 🛠️ Tech Stack
+
+- React.js  
+- TypeScript  
+- Next.js  
+
+---
+
 ## Getting Started
 
 First, run the development server:
